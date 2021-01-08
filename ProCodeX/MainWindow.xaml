@@ -1,0 +1,124 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:w="clr-namespace:ProCodeX"
+        xmlns:shell="clr-namespace:Microsoft.Windows.Shell;assembly=Microsoft.Windows.Shell"
+        xmlns:telerikDocking="clr-namespace:Telerik.Windows.Controls;assembly=Telerik.Windows.Controls.Docking" xmlns:telerik="http://schemas.telerik.com/2008/xaml/presentation"
+        xmlns:syntaxeditor="http://schemas.actiprosoftware.com/winfx/xaml/syntaxeditor" xmlns:Forms="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms" xmlns:ribbon="http://schemas.actiprosoftware.com/winfx/xaml/ribbon" xmlns:themes="http://schemas.actiprosoftware.com/winfx/xaml/themes" x:Name="ProCode_Window"
+        x:Class="ProCodeX.MainWindow"
+    
+        mc:Ignorable="d"
+        Title="ProCode | Untitled" Background="Black" Height="596.3" Width="792.85" WindowStartupLocation="CenterScreen" Icon="atechgeeklogo.png">
+    <Window.Resources>
+        <RoutedUICommand x:Key="ZoomIn" Text="Zoom In" />
+        <RoutedUICommand x:Key="ZoomOut" Text="Zoom Out" />
+    </Window.Resources>
+    <Window.CommandBindings>
+        <CommandBinding Command="New" Executed="NewCommandBinding_Executed"/>
+        <CommandBinding Command="{StaticResource ZoomIn}" Executed="CommandBinding_Executed"/>
+        <CommandBinding Command="{StaticResource ZoomOut}" Executed="CommandBinding_Executed_1"/>
+        <CommandBinding Command="Open" Executed="OpenCommandBinding_Executed"/>
+        <CommandBinding Command="Save" Executed="SaveCommandBinding_Executed"/>
+        <CommandBinding Command="SaveAs" Executed="SaveAsCommandBinding_Executed"/>
+    </Window.CommandBindings>
+    <Window.InputBindings>
+        <KeyBinding Key="N" Modifiers="Control" Command="New"/>
+        <KeyBinding Key="O" Modifiers="Control" Command="Open"/>
+        <KeyBinding Key="S" Modifiers="Control" Command="Save"/>
+        <KeyBinding Key="OemPlus" Modifiers="Control" Command="{StaticResource ZoomIn}"/>
+        <KeyBinding Key="OemMinus" Modifiers="Control" Command="{StaticResource ZoomOut}"/>
+        <KeyBinding Key="S" Modifiers="Control+Shift" Command="SaveAs"/>
+    </Window.InputBindings>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="0*"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Menu VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Height="26" Foreground="White" Background="#FF333333" Grid.Row="1" >
+            <Label x:Name="status" Content="Status: So far so good chief" Foreground="#FF2EFF00" FontSize="9"/>
+            <MenuItem x:Name="LanguageButton" Header="Language" Background="#FF463434" Foreground="White" Click="MenuItem_Click" BorderBrush="#FF333333">
+                <MenuItem x:Name="csharpButton" Header="C#" Background="#FF333333" BorderBrush="#FF333333" Click="csharpButton_Click"/>
+                <MenuItem x:Name="VBNETbutton" Header="VB.NET" Background="#FF333333" BorderBrush="#FF333333" Click="VBNETbutton_Click"/>
+                <MenuItem x:Name="HTMLbutton" Header="HTML" Background="#FF333333" BorderBrush="#FF333333" Click="HTMLbutton_Click"/>
+                <MenuItem x:Name="javascriptButton" Header="JavaScript" Background="#FF333333" BorderBrush="#FF333333" Click="javascriptButton_Click"/>
+                <MenuItem x:Name="XMLbutton" Header="XML" Background="#FF333333" BorderBrush="#FF333333" Click="XMLbutton_Click"/>
+                <MenuItem x:Name="XAMLbutton" Header="XAML" Background="#FF333333" BorderBrush="#FF333333" Click="XAMLbutton_Click"/>
+                <MenuItem x:Name="SQLbutton" Header="SQL" Background="#FF333333" BorderBrush="#FF333333" Click="SQLbutton_Click"/>
+            </MenuItem>
+            <Separator HorizontalAlignment="Stretch"  Background="#FF333333" Width="62"/>
+            <MenuItem Header="▶ Subscribe on YouTube plz" Background="Red" FontFamily="Segoe UI Symbol" Click="MenuItem_Click_1"/>
+            <Separator HorizontalAlignment="Stretch"  Background="#FF333333" Width="12"/>
+            <MenuItem x:Name="DonateButton" Header="Become a patron on Patreon" Background="#FFF96854" FontFamily="Segoe UI Symbol" GotFocus="MenuItem_GotFocus" LostFocus="DonateButton_LostFocus" Click="DonateButton_Click"/>
+            <Separator Width="103" Background="#FF333333"/>
+            <Button Content="Feedback" Click="Button_Click"/>
+        </Menu>
+        <telerik:RadMenu HorizontalAlignment="Stretch"  Grid.RowSpan="2" VerticalAlignment="Top" telerik:StyleManager.Theme="Expression_Dark">
+            <telerik:RadMenuItem Header="File">
+                <telerik:RadMenuItem x:Name="new" Header="New" InputGestureText="Ctrl+N"/>
+                <telerik:RadMenuItem x:Name="open" Header="Open" InputGestureText="Ctrl+O" Click="open_Click_2"/>
+                <telerik:RadMenuItem x:Name="save" Command="Save" Header="Save" InputGestureText="Ctrl+S" Click="save_Click" />
+                <telerik:RadMenuItem x:Name="saveas" Command="SaveAs" Header="Save As" InputGestureText="Ctrl+Shift+S"/>
+                <Separator/>
+                <telerik:RadMenuItem Header="Exit" InputGestureText="Alt+F4" Click="RadMenuItem_Click_1"/>
+            </telerik:RadMenuItem>
+            <telerik:RadMenuItem Header="Edit">
+                <telerik:RadMenuItem x:Name="undoButton" Header="Undo" InputGestureText="Ctrl + Z" Click="undoButton_Click"/>
+                <telerik:RadMenuItem x:Name="redoButton" Header="Redo" InputGestureText="Ctrl + Y" Click="redoButton_Click"/>
+                <telerik:Separator/>
+                <telerik:RadMenuItem x:Name="cutButton" Header="Cut" InputGestureText="Ctrl + X" Click="cutButton_Click"/>
+                <telerik:RadMenuItem x:Name="copyButton" Header="Copy" InputGestureText="Ctrl + C" Click="copyButton_Click"/>
+                <telerik:RadMenuItem x:Name="pasteButton" Header="Paste" InputGestureText="Ctrl + V" Click="pasteButton_Click"/>
+                <telerik:RadMenuItem x:Name="deleteButton" Header="Delete" InputGestureText="Del" Click="deleteButton_Click"/>
+                <telerik:Separator/>
+                <telerik:RadMenuItem x:Name="selectAll" Header="Select All" InputGestureText="Ctrl + A" Click="selectAll_Click"/>
+                <telerik:Separator/>
+                <telerik:RadMenuItem x:Name="settingsButton" Header="ProCode Settings" Click="settingsButton_Click"/>
+            </telerik:RadMenuItem>
+            <telerik:RadMenuItem Header="View">
+                <telerik:RadMenuItem x:Name="zoomIn" Command="{StaticResource ZoomIn}" Header="Zoom In" InputGestureText="Ctrl + Plus" Click="zoomIn_Click"/>
+                <telerik:RadMenuItem x:Name="zoomOut" Command="{StaticResource ZoomOut}" Header="Zoom Out" InputGestureText="Ctrl + Minus" Click="zoomOut_Click"/>
+            </telerik:RadMenuItem>
+            <telerik:RadMenuItem x:Name="compileBtn" Header="Build" Click="CompileBtn_Click">
+                <telerik:RadMenuItem Header="Compile project"/>
+                <telerik:RadMenuItem Header="Publish"/>
+            </telerik:RadMenuItem>
+            <telerik:RadMenuItem Header="Window" Margin="2,0,-2,0" Click="RadMenuItem_Click_2">
+                <telerik:RadMenuItem x:Name="maximizeButton" Header="Maximize" Click="minimizeButton_Click"/>
+                <telerik:RadMenuItem x:Name="minimizeButton" Header="Minimize" Click="minimizeButton_Click_1" />
+            </telerik:RadMenuItem>
+            <telerik:RadMenuItem Header="Help" Margin="2,0,-2,0">
+                <telerik:RadMenuItem x:Name="aboutBtn" Header="AboutProCode" Click="aboutBtn_Click"/>
+            </telerik:RadMenuItem>
+            <Separator/>
+            <telerik:RadMenuItem x:Name="startButton" BorderBrush="#FF23FF00" Background="#FF0AD300" Foreground="Black" Header="▶ Start" Click="startButton_Click"/>
+        </telerik:RadMenu>
+        <telerik:RadSyntaxEditor  x:Name="syntaxEditor" HorizontalAlignment="Stretch"  Grid.Row="1" Margin="0,22,0,26" VerticalAlignment="Stretch" telerik:StyleManager.Theme="Expression_Dark" >
+            <telerik:RadContextMenu.ContextMenu>
+                <telerik:RadContextMenu telerik:StyleManager.Theme="Expression_Dark">
+                    <telerik:RadMenuItem telerik:StyleManager.Theme="Expression_Dark" Header="Undo" InputGestureText="Ctrl + Z"/>
+                    <telerik:RadMenuItem telerik:StyleManager.Theme="Expression_Dark" Header="Redo" InputGestureText="Ctrl + Y"/>
+                    <telerik:Separator/>
+                    <telerik:RadMenuItem telerik:StyleManager.Theme="Expression_Dark" Header="Cut" InputGestureText="Ctrl + X"/>
+                    <telerik:RadMenuItem telerik:StyleManager.Theme="Expression_Dark" Header="Copy" InputGestureText="Ctrl + C"/>
+                    <telerik:RadMenuItem telerik:StyleManager.Theme="Expression_Dark" Header="Paste" InputGestureText="Ctrl + V"/>
+
+                </telerik:RadContextMenu>
+            </telerik:RadContextMenu.ContextMenu>
+        </telerik:RadSyntaxEditor>
+
+
+        <ribbon:TextBox x:Name="compilationtext" HorizontalAlignment="stretch" Height="146" Grid.RowSpan="2" TextWrapping="Wrap" VerticalAlignment="Bottom"  Margin="10,0,17,52" IsReadOnly="True" Visibility="Hidden">
+            <ribbon:TextBox.Foreground>
+                <SolidColorBrush Color="White" themes:TintGroup.Name="ToolBarEdit"/>
+            </ribbon:TextBox.Foreground>
+            <ribbon:TextBox.Background>
+                <SolidColorBrush Color="#FF333333" themes:TintGroup.Name="ToolBarEdit"/>
+            </ribbon:TextBox.Background>
+        </ribbon:TextBox>
+        <telerik:RadButton x:Name="hidebutton" Content="X" HorizontalAlignment="stretch" Height="44" Grid.RowSpan="2" VerticalAlignment="Bottom"  Margin="716,0,17,173" telerik:StyleManager.Theme="Expression_Dark" Click="hidebutton_Click" Visibility="Hidden"/>
+
+
+    </Grid>
+</Window>
