@@ -10,3 +10,8 @@ to download a compiled version go to https://github.com/abdulmalikTechGeek/ProCo
 Support this project on [Patreon](https://www.patreon.com/atechgeek)
 
 [aTechGeek official website](https://atechgeek.website)
+
+## Installation
+
+1. Unpack the zip file and launch ProCodeX.exe as administrator otherwise you'll get crashes
+2. Thats it
