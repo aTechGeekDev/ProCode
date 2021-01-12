@@ -4,6 +4,7 @@ using System.Linq;
 using System.Resources;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -21,6 +22,7 @@ using Telerik.Windows.Controls.SyntaxEditor.UI.IntelliPrompt.Completion;
 using Telerik.Windows.Controls.SyntaxEditor.Taggers;
 using ProCodeX;
 using System.CodeDom.Compiler;
+using System.ComponentModel;
 
 namespace ProCodeX
 {
@@ -30,7 +32,7 @@ namespace ProCodeX
     /// </summary>
     public partial class MainWindow : Window
     {
-        string language = "";
+        public string language = "";
         string filename;
         string filepath;
         bool savedfirsttime = false;
@@ -56,7 +58,22 @@ namespace ProCodeX
 
                 File.Delete(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + @"\compilation.vb");
             }
+            compilationtext.Visibility = Visibility.Hidden;
 
+
+        }
+        public void start()
+        {
+            try
+            {
+                Process p2 = new Process();
+                p2.StartInfo.FileName = "compilation.exe";
+                p2.Start();
+            }
+            catch (Win32Exception e)
+            {
+                System.Windows.MessageBox.Show("E010" + Environment.NewLine + "Your code have some problems, Errors Written below", "ProCode is mad", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void MenuItem_Click(object sender, RoutedEventArgs e)
@@ -196,8 +213,11 @@ namespace ProCodeX
                 using (StreamReader reader = new StreamReader(dlg.FileName))
                 {
                     this.syntaxEditor.Document = new TextDocument(reader);
-                    this.status.Content = "Status: To enable syntax highlighting, choose a language from here";
                     string filepath = dlg.FileName;
+                    filename = System.IO.Path.GetFileName(dlg.FileName); ;
+                    savedfirsttime = true;
+                    Title = "ProCode | " + filename;
+
                 }
             }
         }
@@ -355,11 +375,40 @@ namespace ProCodeX
 
         private void aboutBtn_Click(object sender, Telerik.Windows.RadRoutedEventArgs e)
         {
-            
+            AboutScreen ab = new AboutScreen();
+            ab.Show();
         }
 
         private void CompileBtn_Click(object sender, Telerik.Windows.RadRoutedEventArgs e)
         {
+            if (savedfirsttime == false)
+            {
+                System.Windows.MessageBox.Show("E003" + Environment.NewLine + "Yo, save the file b4 compiling", "ProCode is mad", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            if (language == "")
+            {
+                System.Windows.MessageBox.Show("E004" + Environment.NewLine + "Yo, Choose a language b4 getting excited", "ProCode is mad", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            if (language == "HTML")
+            {
+                System.Windows.MessageBox.Show("E005" + Environment.NewLine + "This Language isn't a programming language, Go to File>Save As Instead", "ProCode is sad", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            if (language == "JAVASCRIPT")
+            {
+                System.Windows.MessageBox.Show("E005" + Environment.NewLine + "This Language isn't supported for exporting, Go to File>Save As Instead", "ProCode is sad", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            if (language == "XML")
+            {
+                System.Windows.MessageBox.Show("E005" + Environment.NewLine + "This Language isn't a programming language, Go to File>Save As Instead", "ProCode is sad", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            if (language == "XAML")
+            {
+                System.Windows.MessageBox.Show("E005" + Environment.NewLine + "This Language isn't a programming language, Go to File>Save As Instead", "ProCode is sad", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            if (language == "SQL")
+            {
+                System.Windows.MessageBox.Show("E005" + Environment.NewLine + "This Language isn't a programming language, Go to File>Save As Instead", "ProCode is sad", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
             if (language == "C#")
             {
                 if (File.Exists(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + @"\compilation.cs"))
@@ -381,12 +430,14 @@ namespace ProCodeX
                 this.syntaxEditor.SelectAll();
                 string selectedText = this.syntaxEditor.Selection.GetSelectedText();
                 string fileName = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + @"\compilation.cs";
+                syntaxEditor.IsSelectionEnabled = false;
                 if (!File.Exists(fileName))
                 {
                     File.Create(fileName).Close();
                     using (StreamWriter sw = File.AppendText(fileName))
                     {
                         sw.WriteLine(selectedText);
+                        syntaxEditor.IsSelectionEnabled = true;
                     }
 
                 }
@@ -410,8 +461,82 @@ namespace ProCodeX
             }
             if (language == "VBNET")
             {
-                if (File.Exists(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + @"\compilation.cs")) { 
-                
+                this.syntaxEditor.SelectAll();
+                string selectedText = this.syntaxEditor.Selection.GetSelectedText();
+                string fileName = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + @"\compilation.vb";
+                syntaxEditor.IsSelectionEnabled = false;
+                if (!File.Exists(fileName))
+                {
+                    File.Create(fileName).Close();
+                    using (StreamWriter sw = File.AppendText(fileName))
+                    {
+                        sw.WriteLine(selectedText);
+                        syntaxEditor.IsSelectionEnabled = true;
+                    }
+
+                }
+                compilationtext.Visibility = Visibility.Visible;
+                hidebutton.Visibility = Visibility.Visible;
+                status.Content = "Status: Compiling...";
+                Process p = new Process();
+                p.StartInfo.UseShellExecute = false;
+                p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                p.StartInfo.RedirectStandardOutput = true;
+                p.StartInfo.FileName = "vbc.exe";
+                p.StartInfo.Arguments = "compilation.vb"; //or your thing
+                p.Start();
+                p.WaitForExit();
+                string result = p.StandardOutput.ReadToEnd();
+
+                compilationtext.Text = result;
+                status.Content = "Status: Compilation finished";
+                VBcompiledfirsttime = true;
+
+
+            }
+        }
+        private async void startButton_Click(object sender, Telerik.Windows.RadRoutedEventArgs e)
+        {
+            if (savedfirsttime == false)
+            {
+                System.Windows.MessageBox.Show("E003" + Environment.NewLine + "Yo, save the file b4 compiling", "ProCode is mad", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            if (language == "")
+            {
+                System.Windows.MessageBox.Show("E004" + Environment.NewLine + "Yo, Choose a language b4 getting excited", "ProCode is mad", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            if (language == "HTML")
+            {
+                System.Windows.MessageBox.Show("E005" + Environment.NewLine + "This Language isn't a programming language, Go to File>Save As Instead", "ProCode is sad", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            if (language == "JAVASCRIPT")
+            {
+                System.Windows.MessageBox.Show("E005" + Environment.NewLine + "This Language isn't supported for exporting, Go to File>Save As Instead", "ProCode is sad", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            if (language == "XML")
+            {
+                System.Windows.MessageBox.Show("E005" + Environment.NewLine + "This Language isn't a programming language, Go to File>Save As Instead", "ProCode is sad", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            if (language == "XAML")
+            {
+                System.Windows.MessageBox.Show("E005" + Environment.NewLine + "This Language isn't a programming language, Go to File>Save As Instead", "ProCode is sad", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            if (language == "SQL")
+            {
+                System.Windows.MessageBox.Show("E005" + Environment.NewLine + "This Language isn't a programming language, Go to File>Save As Instead", "ProCode is sad", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            if (language == "C#")
+            {
+                if (File.Exists(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + @"\compilation.cs"))
+                {
+
                     File.Delete(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + @"\compilation.cs");
                 }
                 if (File.Exists(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + @"\compilation.exe"))
@@ -425,48 +550,253 @@ namespace ProCodeX
                     File.Delete(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + @"\compilation.vb");
                 }
 
-
                 this.syntaxEditor.SelectAll();
                 string selectedText = this.syntaxEditor.Selection.GetSelectedText();
-                string fileName = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + @"\compilation.vb";
+                string fileName = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + @"\compilation.cs";
+                syntaxEditor.IsSelectionEnabled = false;
                 if (!File.Exists(fileName))
                 {
                     File.Create(fileName).Close();
                     using (StreamWriter sw = File.AppendText(fileName))
                     {
                         sw.WriteLine(selectedText);
+                        syntaxEditor.IsSelectionEnabled = true;
                     }
 
                 }
                 compilationtext.Visibility = Visibility.Visible;
                 hidebutton.Visibility = Visibility.Visible;
-
+                status.Content = "Status: Compiling..";
                 Process p = new Process();
                 p.StartInfo.UseShellExecute = false;
                 p.StartInfo.RedirectStandardOutput = true;
-                p.StartInfo.FileName = "vbc.exe";
-                p.StartInfo.Arguments = "compilation.vb"; //or your thing
+                p.StartInfo.FileName = "csc.exe";
+                p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                p.StartInfo.Arguments = "compilation.cs"; //or your thing
                 p.Start();
                 p.WaitForExit();
                 string result = p.StandardOutput.ReadToEnd();
 
                 compilationtext.Text = result;
-                status.Content = "Status: Compilation Successful";
+                status.Content = "Status: Compilation finished";
+                cSharpcompiledfirsttime = true;
+                await Task.Delay(1000);
+                start();
+
+
+            }
+            if (language == "VBNET")
+            {
+                this.syntaxEditor.SelectAll();
+                string selectedText = this.syntaxEditor.Selection.GetSelectedText();
+                string fileName = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + @"\compilation.vb";
+                syntaxEditor.IsSelectionEnabled = false;
+                if (!File.Exists(fileName))
+                {
+                    File.Create(fileName).Close();
+                    using (StreamWriter sw = File.AppendText(fileName))
+                    {
+                        sw.WriteLine(selectedText);
+                        syntaxEditor.IsSelectionEnabled = true;
+                    }
+
+                }
+                compilationtext.Visibility = Visibility.Visible;
+                hidebutton.Visibility = Visibility.Visible;
+                status.Content = "Status: Compiling..";
+                Process p = new Process();
+                p.StartInfo.UseShellExecute = false;
+                p.StartInfo.RedirectStandardOutput = true;
+                p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                p.StartInfo.FileName = "vbc.exe";
+                p.StartInfo.Arguments = "compilation.vb"; //or your thing
+                p.Start();
+                p.WaitForExit();
+                string result = p.StandardOutput.ReadToEnd();
+                compilationtext.Text = result;
+                status.Content = "Status: Compilation finished";
                 VBcompiledfirsttime = true;
+                await Task.Delay(1000);
+                start();
 
 
             }
         }
-        private void startButton_Click(object sender, Telerik.Windows.RadRoutedEventArgs e)
-        {
 
-        }
 
         private void hidebutton_Click(object sender, RoutedEventArgs e)
         {
             compilationtext.Visibility = Visibility.Hidden;
             hidebutton.Visibility = Visibility.Hidden;
         }
+
+        private void publishBtn_Click(object sender, Telerik.Windows.RadRoutedEventArgs e)
+        {
+            if (language == "C#")
+            {
+                if (savedfirsttime == false)
+                {
+                    System.Windows.MessageBox.Show("E003" + Environment.NewLine + "Yo, save the file b4 publishing", "ProCode is mad", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+                if (language == "")
+                {
+                    System.Windows.MessageBox.Show("E004" + Environment.NewLine + "Yo, Choose a language b4 getting excited", "ProCode is mad", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+                if (language == "HTML")
+                {
+                    System.Windows.MessageBox.Show("E004" + Environment.NewLine + "This Language isn't a programming language, Go to File>Save As Instead", "ProCode is sad", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+                else if (language == "JAVASCRIPT")
+                {
+                    System.Windows.MessageBox.Show("E004" + Environment.NewLine + "This Language isn't supported for exporting, Go to File>Save As Instead", "ProCode is sad", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+                else if (language == "XML")
+                {
+                    System.Windows.MessageBox.Show("E004" + Environment.NewLine + "This Language isn't a programming language, Go to File>Save As Instead", "ProCode is sad", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+                else if (language == "XAML")
+                {
+                    System.Windows.MessageBox.Show("E004" + Environment.NewLine + "This Language isn't a programming language, Go to File>Save As Instead", "ProCode is sad", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+                else if (language == "SQL")
+                {
+                    System.Windows.MessageBox.Show("E004" + Environment.NewLine + "This Language isn't a programming language, Go to File>Save As Instead", "ProCode is sad", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+                else
+                { 
+                        this.syntaxEditor.SelectAll();
+                        string selectedText = this.syntaxEditor.Selection.GetSelectedText();
+                        string fileName = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + @"\compilation.cs";
+                        syntaxEditor.IsSelectionEnabled = false;
+                        if (!File.Exists(fileName))
+                        {
+                            File.Create(fileName).Close();
+                            using (StreamWriter sw = File.AppendText(fileName))
+                            {
+                                sw.WriteLine(selectedText);
+                                syntaxEditor.IsSelectionEnabled = true;
+                            }
+
+                        }
+                        compilationtext.Visibility = Visibility.Visible;
+                        hidebutton.Visibility = Visibility.Visible;
+
+                        Process p = new Process();
+                        p.StartInfo.UseShellExecute = false;
+                        p.StartInfo.RedirectStandardOutput = true;
+                        p.StartInfo.FileName = "csc.exe";
+                        p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                        p.StartInfo.Arguments = "compilation.cs"; //or your thing
+                        p.Start();
+                        p.WaitForExit();
+                        string results = p.StandardOutput.ReadToEnd();
+
+                        compilationtext.Text = results;
+                        status.Content = "Status: Compilation Successful";
+                        var dlgw = new CommonOpenFileDialog();
+                        dlgw.Title = "Export your code:";
+                        dlgw.IsFolderPicker = true;
+
+                        dlgw.AddToMostRecentlyUsedList = false;
+                        dlgw.AllowNonFileSystemItems = false;
+                        dlgw.EnsureFileExists = true;
+                        dlgw.EnsurePathExists = true;
+                        dlgw.EnsureReadOnly = false;
+                        dlgw.EnsureValidNames = true;
+                        dlgw.Multiselect = false;
+                        dlgw.ShowPlacesList = true;
+
+                        if (dlgw.ShowDialog() == CommonFileDialogResult.Ok)
+                        {
+                        var folder = dlgw.FileName;
+                        File.Copy(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + @"\compilation.cs", folder + @"\compilation.cs");
+                        File.Copy(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + @"\compilation.exe", folder + @"\compilation.exe");
+                    }
+                }
+            }
+        }
+
+        private void new_Click_1(object sender, Telerik.Windows.RadRoutedEventArgs e)
+        {
+            MainWindow mw = new MainWindow();
+            mw.Show();
+        }
+        private void Window_Closing(object sender, CancelEventArgs e)
+        {
+            
+            MessageBoxResult result = System.Windows.MessageBox.Show("Do you want to save b4 exit?", "Warning", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+            if (result == MessageBoxResult.No)
+            {
+            }
+            if(result == MessageBoxResult.Yes){
+                if (savedfirsttime == false)
+                {
+                    saveascommand();
+                }
+                else
+                {
+
+                    this.syntaxEditor.SelectAll();
+                    string selectedText = this.syntaxEditor.Selection.GetSelectedText();
+                    syntaxEditor.IsSelectionEnabled = false;
+                    if (selectedText == "")
+                    {
+                        System.Windows.MessageBox.Show("E002" + Environment.NewLine + "Yo, you can't save an empty file", "ProCode is mad", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                    else
+                    {
+                        File.WriteAllText(filename, selectedText.ToString());
+                        syntaxEditor.IsSelectionEnabled = true;
+                    }
+                }
+            }
+            if(result == MessageBoxResult.Cancel)
+            {
+                e.Cancel = true;
+            }
+        }
+
+        private void syntaxEditor_DragOver(object sender, System.Windows.DragEventArgs e)
+        {
+
+        }
+
+        private void undoContext_Click(object sender, Telerik.Windows.RadRoutedEventArgs e)
+        {
+            syntaxEditor.Undo();
+        }
+
+        private void redoContext_Click(object sender, Telerik.Windows.RadRoutedEventArgs e)
+        {
+            syntaxEditor.Redo();
+        }
+
+        private void cutContext_Click(object sender, Telerik.Windows.RadRoutedEventArgs e)
+        {
+            syntaxEditor.Cut();
+        }
+
+        private void copyContext_Click(object sender, Telerik.Windows.RadRoutedEventArgs e)
+        {
+            syntaxEditor.Copy();
+        }
+
+        private void pasteContext_Click(object sender, Telerik.Windows.RadRoutedEventArgs e)
+        {
+            syntaxEditor.Paste();
+        }
     }
-    }
+
+}
+
+
+
+
 

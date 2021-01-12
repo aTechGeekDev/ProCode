@@ -1,0 +1,16 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:telerik="http://schemas.telerik.com/2008/xaml/presentation" xmlns:gauge="http://schemas.actiprosoftware.com/winfx/xaml/gauge" x:Class="ProCodeX.AboutScreen"
+        Title="About ProCode" Height="350" Width="525" WindowStartupLocation="CenterScreen" ShowInTaskbar="False" ResizeMode="NoResize">
+    <Border CornerRadius="0" BorderBrush="#FFA26DFF" BorderThickness="5" Background="Black">
+        <Grid MouseRightButtonDown="Grid_MouseRightButtonDown">
+            <Image HorizontalAlignment="Left" Height="100" Margin="204,10,0,0" VerticalAlignment="Top" Width="100" Source="atechgeeklogo.png"/>
+            <Label Content="ProCode" HorizontalAlignment="Left" Margin="179,84,0,0" VerticalAlignment="Top" Foreground="LightGray" FontSize="36" FontWeight="Bold" FontFamily="Prod"/>
+            <Label Content="Copyright 2021© aTechGeek. All rights reserved" HorizontalAlignment="Left" Margin="120,258,0,0" VerticalAlignment="Top" Foreground="LightGray" FontSize="12" FontFamily="Prod"/>
+            <Label Content="www.atechgeek.website" HorizontalAlignment="Left" Margin="187,282,0,0" VerticalAlignment="Top" Foreground="LightGray" FontSize="12" FontFamily="Prod"/>
+            <Label x:Name="LoadingLabel" Content="If you're here, Thank u for using ProCode" HorizontalAlignment="Left" Margin="10,306,0,0" VerticalAlignment="Top" Foreground="LightGray" FontFamily="Prod"/>
+            <Label Content="Alpha 2, 30% Complete" HorizontalAlignment="Left" Margin="187,137,0,0" VerticalAlignment="Top" Foreground="LightGray" FontSize="12" FontFamily="Prod" Width="134"/>
+        </Grid>
+    </Border>
+</Window>

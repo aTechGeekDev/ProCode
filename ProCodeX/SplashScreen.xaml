@@ -13,7 +13,7 @@
             <Label x:Name="LoadingLabel" Content="Loading: Main Window" HorizontalAlignment="Left" Margin="10,298,0,0" VerticalAlignment="Top" Foreground="LightGray" FontFamily="Prod"/>
             <Label Content="It literally took me forever to make the borders round" HorizontalAlignment="Left" Margin="340,-11,0,0" VerticalAlignment="Top" Foreground="LightGray" FontSize="6" FontFamily="Prod"/>
             <telerik:RadProgressBar x:Name="ProgressBar1"  BorderBrush="#5d00ff" HorizontalAlignment="Left" Height="9" Margin="10,321,0,0" VerticalAlignment="Top" Width="495" telerik:StyleManager.Theme="Crystal" Background="Black" Foreground="#FF5D00FF" ValueChanged="RadProgressBar_ValueChanged"/>
-            <Label Content="Alpha 1, 15% Complete" HorizontalAlignment="Left" Margin="96,68,0,0" VerticalAlignment="Top" Foreground="LightGray" FontSize="12" FontFamily="Prod" Width="155"/>
+            <Label Content="Alpha 2, 30% Complete" HorizontalAlignment="Left" Margin="96,68,0,0" VerticalAlignment="Top" Foreground="LightGray" FontSize="12" FontFamily="Prod" Width="155"/>
         </Grid>
     </Border>
 </Window>
