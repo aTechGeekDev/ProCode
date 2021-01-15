@@ -73,6 +73,16 @@ namespace ProCodeX.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap atechgeeklogo2 {
+            get {
+                object obj = ResourceManager.GetObject("atechgeeklogo2", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap Play {
             get {
                 object obj = ResourceManager.GetObject("Play", resourceCulture);
@@ -167,6 +177,16 @@ namespace ProCodeX.Properties {
         internal static string recent5path {
             get {
                 return ResourceManager.GetString("recent5path", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon techgeeklogo {
+            get {
+                object obj = ResourceManager.GetObject("techgeeklogo", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
             }
         }
     }

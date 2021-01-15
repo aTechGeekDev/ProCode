@@ -1,28 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Resources;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using System.Diagnostics;
-using Telerik.Windows.Controls.SyntaxEditor.Tagging.Taggers;
-using System.Windows.Forms;
-using Telerik.Windows.SyntaxEditor.Core.Text;
 using System.IO;
-using Telerik.Windows.Controls.SyntaxEditor.UI.IntelliPrompt.Completion;
-using Telerik.Windows.Controls.SyntaxEditor.Taggers;
-using ProCodeX;
-using System.CodeDom.Compiler;
 using System.ComponentModel;
+using ActiproSoftware.Text.Languages.CSharp.Implementation;
+using ActiproSoftware.Text.Languages.VB.Implementation;
+using ActiproSoftware.Text.Languages.Xml.Implementation;
+using ActiproSoftware.Text.Languages.JavaScript.Implementation;
+using ActiproSoftware.Windows.Themes;
+using ActiproSoftware.Text;
+using ActiproSoftware.Text.Implementation;
+using Telerik.Windows.Controls;
+using ActiproSoftware.Windows.Themes;
 
 namespace ProCodeX
 {
@@ -30,7 +22,7 @@ namespace ProCodeX
     /// <summary>
     /// Interaction logic for Welcome.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow
     {
         public string language = "";
         string filename;
@@ -43,7 +35,8 @@ namespace ProCodeX
         public MainWindow()
         {
             InitializeComponent();
-            if (File.Exists(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + @"\compilation.cs"))
+            ThemesAeroThemeCatalogRegistrar.Register();
+           if (File.Exists(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + @"\compilation.cs"))
             {
 
                 File.Delete(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + @"\compilation.cs");
@@ -59,9 +52,14 @@ namespace ProCodeX
                 File.Delete(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + @"\compilation.vb");
             }
             compilationtext.Visibility = Visibility.Hidden;
+            ActiproSoftware.Windows.Themes.ThemeManager.SetTheme(syntaxEditor, ThemeNames.Black);
+            ActiproSoftware.Windows.Themes.ThemeManager.SetAreNativeThemesEnabled(syntaxEditor, true);
+            MainWindow radWindow = new MainWindow();
+            radWindow.IconTemplate = this.Resources["WindowIconTemplate"] as DataTemplate;
 
 
         }
+
         public void start()
         {
             try
@@ -72,7 +70,7 @@ namespace ProCodeX
             }
             catch (Win32Exception e)
             {
-                System.Windows.MessageBox.Show("E010" + Environment.NewLine + "Your code have some problems, Errors Written below", "ProCode is mad", MessageBoxButton.OK, MessageBoxImage.Error);
+                System.Windows.MessageBox.Show("E010" + e + Environment.NewLine + "Your code have some problems, Errors Written below", "ProCode is mad", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -101,20 +99,14 @@ namespace ProCodeX
             Nullable<bool> result = dlg.ShowDialog();
             if (result == true)
             {
-                using (StreamReader reader = new StreamReader(dlg.FileName))
-                {
-                    this.syntaxEditor.Document = new TextDocument(reader);
+                syntaxEditor.Document.LoadFile(dlg.FileName);
                     filename = System.IO.Path.GetFileName(dlg.FileName); ;
                     savedfirsttime = true;
-                    Title = "ProCode | " + filename;
-                }
+                  
             }
         }
         public void saveascommand()
         {
-            this.syntaxEditor.SelectAll();
-            string selectedText = this.syntaxEditor.Selection.GetSelectedText();
-            syntaxEditor.IsSelectionEnabled = false;
             Microsoft.Win32.SaveFileDialog dlgs = new Microsoft.Win32.SaveFileDialog();
             dlgs.FileName = "Document"; // Default file name
             dlgs.DefaultExt = ".text"; // Default file extension
@@ -122,16 +114,12 @@ namespace ProCodeX
             Nullable<bool> result = dlgs.ShowDialog();
             if (result == true)
             {
-                File.WriteAllText(dlgs.FileName, string.Empty);
-                using (StreamWriter sw = File.AppendText(dlgs.FileName))
-                {
-                    sw.WriteLine(selectedText);
+                    syntaxEditor.Document.SaveFile(dlgs.FileName, LineTerminator.CarriageReturnNewline);
                     filename = System.IO.Path.GetFileName(dlgs.FileName);
                     filepath = dlgs.FileName;
                     savedfirsttime = true;
-                    Title = "ProCode | " + filename;
-                    syntaxEditor.IsSelectionEnabled = true;
-                }
+               
+
             }
 
 
@@ -143,8 +131,9 @@ namespace ProCodeX
         }
         private void NewCommandBinding_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            MainWindow win2 = new MainWindow();
+            Window win2 = new Window();
             win2.Show();
+            
 
         }
         public void SaveCommandBinding_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -155,18 +144,13 @@ namespace ProCodeX
             }
             else
             {
-
-                this.syntaxEditor.SelectAll();
-                string selectedText = this.syntaxEditor.Selection.GetSelectedText();
-                syntaxEditor.IsSelectionEnabled = false;
-                if (selectedText == "")
+                if (syntaxEditor.Text == "")
                 {
                     System.Windows.MessageBox.Show("E002" + Environment.NewLine + "Yo, you can't save an empty file", "ProCode is mad", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
                 else
                 {
-                    File.WriteAllText(filename, selectedText.ToString());
-                    syntaxEditor.IsSelectionEnabled = true;
+                    syntaxEditor.Document.SaveFile(filename, LineTerminator.CarriageReturnNewline);
                 }
             }
         }
@@ -183,11 +167,8 @@ namespace ProCodeX
 
         private void csharpButton_Click(object sender, RoutedEventArgs e)
         {
-            var cSharpTagger = new CSharpTagger(this.syntaxEditor);
-            this.syntaxEditor.TaggersRegistry.RegisterTagger(cSharpTagger);
+            syntaxEditor.Document.Language = new CSharpSyntaxLanguage();
             language = "C#";
-            this.status.Content = "Status: So far so good chief";
-            LanguageButton.IsEnabled = false;
         }
 
         private void syntaxEditor_TextInput(object sender, TextCompositionEventArgs e)
@@ -197,7 +178,7 @@ namespace ProCodeX
 
         private void new_Click(object sender, Telerik.Windows.RadRoutedEventArgs e)
         {
-            MainWindow win2 = new MainWindow();
+            Window win2 = new Window();
             win2.Show();
         }
 
@@ -212,11 +193,10 @@ namespace ProCodeX
             {
                 using (StreamReader reader = new StreamReader(dlg.FileName))
                 {
-                    this.syntaxEditor.Document = new TextDocument(reader);
+                    syntaxEditor.Document.LoadFile(dlg.FileName);
                     string filepath = dlg.FileName;
                     filename = System.IO.Path.GetFileName(dlg.FileName); ;
                     savedfirsttime = true;
-                    Title = "ProCode | " + filename;
 
                 }
             }
@@ -224,20 +204,14 @@ namespace ProCodeX
 
         public void VBNETbutton_Click(object sender, RoutedEventArgs e)
         {
-            var VbnetTagger = new VisualBasicTagger(this.syntaxEditor);
-            this.syntaxEditor.TaggersRegistry.RegisterTagger(VbnetTagger);
-            this.status.Content = "Status: So far so good chief";
+            syntaxEditor.Document.Language = new VBSyntaxLanguage();
             language = "VBNET";
-            LanguageButton.IsEnabled = false;
         }
 
         private void HTMLbutton_Click(object sender, RoutedEventArgs e)
         {
-            var HTML = new XmlTagger(this.syntaxEditor);
-            this.syntaxEditor.TaggersRegistry.RegisterTagger(HTML);
-            this.status.Content = "Status: So far so good chief";
+            syntaxEditor.Document.Language = new XmlSyntaxLanguage();
             language = "HTML";
-            LanguageButton.IsEnabled = false;
 
         }
 
@@ -253,98 +227,91 @@ namespace ProCodeX
 
         private void javascriptButton_Click(object sender, RoutedEventArgs e)
         {
-            var javaScriptTagger = new JavaScriptTagger(this.syntaxEditor);
-            this.syntaxEditor.TaggersRegistry.RegisterTagger(javaScriptTagger);
-            this.status.Content = "Status: So far so good chief";
+            syntaxEditor.Document.Language = new JavaScriptSyntaxLanguage();
             language = "JAVASCRIPT";
-            LanguageButton.IsEnabled = false;
         }
 
         private void XMLbutton_Click(object sender, RoutedEventArgs e)
         {
-            var xml = new XmlTagger(this.syntaxEditor);
-            this.syntaxEditor.TaggersRegistry.RegisterTagger(xml);
-            this.status.Content = "Status: So far so good chief";
+            syntaxEditor.Document.Language = new XmlSyntaxLanguage();
             language = "XML";
-            LanguageButton.IsEnabled = false;
         }
 
         private void XAMLbutton_Click(object sender, RoutedEventArgs e)
         {
-            var xaml = new XmlTagger(this.syntaxEditor);
-            this.syntaxEditor.TaggersRegistry.RegisterTagger(xaml);
-            this.status.Content = "Status: So far so good chief";
+            syntaxEditor.Document.Language = new XmlSyntaxLanguage();
             language = "XAML";
-            LanguageButton.IsEnabled = false;
         }
 
         private void SQLbutton_Click(object sender, RoutedEventArgs e)
         {
-            var SQL = new SqlTagger(this.syntaxEditor);
-            this.syntaxEditor.TaggersRegistry.RegisterTagger(SQL);
-            this.status.Content = "Status: So far so good chief";
-            language = "SQL";
-            LanguageButton.IsEnabled = false;
+            SyntaxLanguageDefinitionSerializer serializer = new SyntaxLanguageDefinitionSerializer();
+            string path = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + @"\langdef\Sql.langdef";
+            ISyntaxLanguage language = serializer.LoadFromFile(path);
+            this.syntaxEditor.Document.Language = language;
         }
 
         private void RadMenuItem_Click_1(object sender, Telerik.Windows.RadRoutedEventArgs e)
         {
-            this.Close();
         }
 
         private void undoButton_Click(object sender, Telerik.Windows.RadRoutedEventArgs e)
         {
-            syntaxEditor.Undo();
+            syntaxEditor.Document.UndoHistory.Undo();
         }
 
         private void redoButton_Click(object sender, Telerik.Windows.RadRoutedEventArgs e)
         {
-            syntaxEditor.Redo();
+            syntaxEditor.Document.UndoHistory.Redo();
         }
 
         private void cutButton_Click(object sender, Telerik.Windows.RadRoutedEventArgs e)
         {
-            syntaxEditor.Cut();
+            syntaxEditor.ActiveView.CutToClipboard();
+
         }
 
         private void copyButton_Click(object sender, Telerik.Windows.RadRoutedEventArgs e)
         {
-            syntaxEditor.Copy();
+            syntaxEditor.ActiveView.CopyToClipboard();
         }
 
         private void pasteButton_Click(object sender, Telerik.Windows.RadRoutedEventArgs e)
         {
-            syntaxEditor.Paste();
+            syntaxEditor.ActiveView.PasteFromClipboard();
         }
 
         private void deleteButton_Click(object sender, Telerik.Windows.RadRoutedEventArgs e)
         {
-            syntaxEditor.Delete();
         }
 
         private void selectAll_Click(object sender, Telerik.Windows.RadRoutedEventArgs e)
         {
-            syntaxEditor.SelectAll();
+            syntaxEditor.ActiveView.Selection.SelectAll();
         }
 
         private void zoomIn_Click(object sender, Telerik.Windows.RadRoutedEventArgs e)
         {
-            syntaxEditor.ZoomIn();
+            var level = syntaxEditor.ZoomLevel;
+            syntaxEditor.ZoomLevel = level + 1.0;
         }
 
         private void zoomOut_Click(object sender, Telerik.Windows.RadRoutedEventArgs e)
         {
-            syntaxEditor.ZoomOut();
+            var level = syntaxEditor.ZoomLevel;
+            syntaxEditor.ZoomLevel = level - 0.1;
         }
 
         private void CommandBinding_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            syntaxEditor.ZoomIn();
+            var level = syntaxEditor.ZoomLevel;
+            syntaxEditor.ZoomLevel = level + 0.1;
         }
 
         private void CommandBinding_Executed_1(object sender, ExecutedRoutedEventArgs e)
         {
-            syntaxEditor.ZoomOut();
+            var level = syntaxEditor.ZoomLevel;
+            syntaxEditor.ZoomLevel = level - 0.1;
         }
 
         private void RadMenuItem_Click_2(object sender, Telerik.Windows.RadRoutedEventArgs e)
@@ -369,9 +336,17 @@ namespace ProCodeX
             fed.Show();
         }
 
-        private void minimizeButton_Click(object sender, Telerik.Windows.RadRoutedEventArgs e) => this.WindowState = System.Windows.WindowState.Maximized;
+        private void minimizeButton_Click(object sender, Telerik.Windows.RadRoutedEventArgs e) {
+            Window win = new Window();
+            win.WindowState = System.Windows.WindowState.Minimized;
 
-        private void minimizeButton_Click_1(object sender, Telerik.Windows.RadRoutedEventArgs e) => this.WindowState = System.Windows.WindowState.Minimized;
+        }
+
+        private void minimizeButton_Click_1(object sender, Telerik.Windows.RadRoutedEventArgs e) {
+
+            Window win = new Window();
+            win.WindowState = System.Windows.WindowState.Minimized;
+        }
 
         private void aboutBtn_Click(object sender, Telerik.Windows.RadRoutedEventArgs e)
         {
@@ -427,17 +402,13 @@ namespace ProCodeX
                     File.Delete(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + @"\compilation.vb");
                 }
 
-                this.syntaxEditor.SelectAll();
-                string selectedText = this.syntaxEditor.Selection.GetSelectedText();
                 string fileName = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + @"\compilation.cs";
-                syntaxEditor.IsSelectionEnabled = false;
                 if (!File.Exists(fileName))
                 {
                     File.Create(fileName).Close();
                     using (StreamWriter sw = File.AppendText(fileName))
                     {
-                        sw.WriteLine(selectedText);
-                        syntaxEditor.IsSelectionEnabled = true;
+                        syntaxEditor.Document.SaveFile(fileName, LineTerminator.CarriageReturnNewline);
                     }
 
                 }
@@ -461,17 +432,13 @@ namespace ProCodeX
             }
             if (language == "VBNET")
             {
-                this.syntaxEditor.SelectAll();
-                string selectedText = this.syntaxEditor.Selection.GetSelectedText();
                 string fileName = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + @"\compilation.vb";
-                syntaxEditor.IsSelectionEnabled = false;
                 if (!File.Exists(fileName))
                 {
                     File.Create(fileName).Close();
                     using (StreamWriter sw = File.AppendText(fileName))
                     {
-                        sw.WriteLine(selectedText);
-                        syntaxEditor.IsSelectionEnabled = true;
+                    syntaxEditor.Document.SaveFile(fileName, LineTerminator.CarriageReturnNewline);
                     }
 
                 }
@@ -479,7 +446,6 @@ namespace ProCodeX
                 hidebutton.Visibility = Visibility.Visible;
                 status.Content = "Status: Compiling...";
                 Process p = new Process();
-                p.StartInfo.UseShellExecute = false;
                 p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
                 p.StartInfo.RedirectStandardOutput = true;
                 p.StartInfo.FileName = "vbc.exe";
@@ -550,18 +516,12 @@ namespace ProCodeX
                     File.Delete(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + @"\compilation.vb");
                 }
 
-                this.syntaxEditor.SelectAll();
-                string selectedText = this.syntaxEditor.Selection.GetSelectedText();
                 string fileName = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + @"\compilation.cs";
-                syntaxEditor.IsSelectionEnabled = false;
                 if (!File.Exists(fileName))
                 {
                     File.Create(fileName).Close();
-                    using (StreamWriter sw = File.AppendText(fileName))
-                    {
-                        sw.WriteLine(selectedText);
-                        syntaxEditor.IsSelectionEnabled = true;
-                    }
+
+                        syntaxEditor.Document.SaveFile(fileName, LineTerminator.CarriageReturnNewline);
 
                 }
                 compilationtext.Visibility = Visibility.Visible;
@@ -587,18 +547,11 @@ namespace ProCodeX
             }
             if (language == "VBNET")
             {
-                this.syntaxEditor.SelectAll();
-                string selectedText = this.syntaxEditor.Selection.GetSelectedText();
                 string fileName = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + @"\compilation.vb";
-                syntaxEditor.IsSelectionEnabled = false;
                 if (!File.Exists(fileName))
                 {
                     File.Create(fileName).Close();
-                    using (StreamWriter sw = File.AppendText(fileName))
-                    {
-                        sw.WriteLine(selectedText);
-                        syntaxEditor.IsSelectionEnabled = true;
-                    }
+                        syntaxEditor.Document.SaveFile(fileName, LineTerminator.CarriageReturnNewline);
 
                 }
                 compilationtext.Visibility = Visibility.Visible;
@@ -671,20 +624,16 @@ namespace ProCodeX
                 }
                 else
                 { 
-                        this.syntaxEditor.SelectAll();
-                        string selectedText = this.syntaxEditor.Selection.GetSelectedText();
                         string fileName = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + @"\compilation.cs";
-                        syntaxEditor.IsSelectionEnabled = false;
                         if (!File.Exists(fileName))
                         {
                             File.Create(fileName).Close();
                             using (StreamWriter sw = File.AppendText(fileName))
                             {
-                                sw.WriteLine(selectedText);
-                                syntaxEditor.IsSelectionEnabled = true;
-                            }
-
+                            syntaxEditor.Document.SaveFile(fileName, LineTerminator.CarriageReturnNewline);
                         }
+
+                    }
                         compilationtext.Visibility = Visibility.Visible;
                         hidebutton.Visibility = Visibility.Visible;
 
@@ -725,7 +674,7 @@ namespace ProCodeX
 
         private void new_Click_1(object sender, Telerik.Windows.RadRoutedEventArgs e)
         {
-            MainWindow mw = new MainWindow();
+            Window mw = new Window();
             mw.Show();
         }
         private void Window_Closing(object sender, CancelEventArgs e)
@@ -742,18 +691,13 @@ namespace ProCodeX
                 }
                 else
                 {
-
-                    this.syntaxEditor.SelectAll();
-                    string selectedText = this.syntaxEditor.Selection.GetSelectedText();
-                    syntaxEditor.IsSelectionEnabled = false;
-                    if (selectedText == "")
+                    if (syntaxEditor.Text == "")
                     {
                         System.Windows.MessageBox.Show("E002" + Environment.NewLine + "Yo, you can't save an empty file", "ProCode is mad", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
                     else
                     {
-                        File.WriteAllText(filename, selectedText.ToString());
-                        syntaxEditor.IsSelectionEnabled = true;
+                        syntaxEditor.Document.SaveFile(filename, LineTerminator.CarriageReturnNewline);
                     }
                 }
             }
@@ -770,27 +714,32 @@ namespace ProCodeX
 
         private void undoContext_Click(object sender, Telerik.Windows.RadRoutedEventArgs e)
         {
-            syntaxEditor.Undo();
+            syntaxEditor.Document.UndoHistory.Undo();
         }
 
         private void redoContext_Click(object sender, Telerik.Windows.RadRoutedEventArgs e)
         {
-            syntaxEditor.Redo();
+            syntaxEditor.Document.UndoHistory.Redo();
         }
 
         private void cutContext_Click(object sender, Telerik.Windows.RadRoutedEventArgs e)
         {
-            syntaxEditor.Cut();
+            syntaxEditor.ActiveView.CutToClipboard();
         }
 
         private void copyContext_Click(object sender, Telerik.Windows.RadRoutedEventArgs e)
         {
-            syntaxEditor.Copy();
+            syntaxEditor.ActiveView.CopyToClipboard();
         }
 
         private void pasteContext_Click(object sender, Telerik.Windows.RadRoutedEventArgs e)
         {
-            syntaxEditor.Paste();
+            syntaxEditor.ActiveView.PasteFromClipboard();
+        }
+
+        private void addButton_Click(object sender, RoutedEventArgs e)
+        {
+            
         }
     }
 

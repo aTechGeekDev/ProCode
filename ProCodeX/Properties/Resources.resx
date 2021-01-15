@@ -121,6 +121,9 @@
   <data name="atechgeeklogo" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\atechgeeklogo.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="atechgeeklogo2" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\atechgeeklogo.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="Play" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Assets\play.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -153,5 +156,8 @@
   </data>
   <data name="recent5path" xml:space="preserve">
     <value />
+  </data>
+  <data name="techgeeklogo" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\atechgeeklogo.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

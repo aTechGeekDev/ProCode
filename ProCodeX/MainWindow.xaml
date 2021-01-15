@@ -1,4 +1,4 @@
-﻿<Window
+﻿<telerik:RadWindow
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -6,31 +6,30 @@
         xmlns:w="clr-namespace:ProCodeX"
         xmlns:shell="clr-namespace:Microsoft.Windows.Shell;assembly=Microsoft.Windows.Shell"
         xmlns:telerikDocking="clr-namespace:Telerik.Windows.Controls;assembly=Telerik.Windows.Controls.Docking" xmlns:telerik="http://schemas.telerik.com/2008/xaml/presentation"
-        xmlns:syntaxeditor="http://schemas.actiprosoftware.com/winfx/xaml/syntaxeditor" xmlns:Forms="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms" xmlns:ribbon="http://schemas.actiprosoftware.com/winfx/xaml/ribbon" xmlns:themes="http://schemas.actiprosoftware.com/winfx/xaml/themes" xmlns:barCode="http://schemas.actiprosoftware.com/winfx/xaml/barcode" x:Name="ProCode_Window"
+        xmlns:syntaxeditor="http://schemas.actiprosoftware.com/winfx/xaml/syntaxeditor" xmlns:Forms="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms" xmlns:ribbon="http://schemas.actiprosoftware.com/winfx/xaml/ribbon" xmlns:themes="http://schemas.actiprosoftware.com/winfx/xaml/themes" xmlns:barCode="http://schemas.actiprosoftware.com/winfx/xaml/barcode" xmlns:eo="http://schemas.essentialobjects.com/wpf/" x:Name="Window"
         x:Class="ProCodeX.MainWindow"
-        Closing="Window_Closing"
         mc:Ignorable="d"
-        Title="ProCode | Untitled" Background="Black" Height="678.3" Width="851.35" WindowStartupLocation="CenterScreen" Icon="atechgeeklogo.png">
-    <Window.Resources>
+        Background="Black" Height="678.3" Width="851.35" WindowStartupLocation="CenterScreen" Icon="" telerik:StyleManager.Theme="Expression_Dark" Header="ProCode">
+    <telerik:RadWindow.Resources>
         <RoutedUICommand x:Key="ZoomIn" Text="Zoom In" />
         <RoutedUICommand x:Key="ZoomOut" Text="Zoom Out" />
-    </Window.Resources>
-    <Window.CommandBindings>
+    </telerik:RadWindow.Resources>
+    <telerik:RadWindow.CommandBindings>
         <CommandBinding Command="New" Executed="NewCommandBinding_Executed"/>
         <CommandBinding Command="{StaticResource ZoomIn}" Executed="CommandBinding_Executed"/>
         <CommandBinding Command="{StaticResource ZoomOut}" Executed="CommandBinding_Executed_1"/>
         <CommandBinding Command="Open" Executed="OpenCommandBinding_Executed"/>
         <CommandBinding Command="Save" Executed="SaveCommandBinding_Executed"/>
         <CommandBinding Command="SaveAs" Executed="SaveAsCommandBinding_Executed"/>
-    </Window.CommandBindings>
-    <Window.InputBindings>
+    </telerik:RadWindow.CommandBindings>
+    <telerik:RadWindow.InputBindings>
         <KeyBinding Key="N" Modifiers="Control" Command="New"/>
-        <KeyBinding Key="O" Modifiers="Control" Command="Open"/>
+        <KeyBinding Key="O"  Modifiers="Control" Command="Open"/>
         <KeyBinding Key="S" Modifiers="Control" Command="Save"/>
         <KeyBinding Key="OemPlus" Modifiers="Control" Command="{StaticResource ZoomIn}"/>
         <KeyBinding Key="OemMinus" Modifiers="Control" Command="{StaticResource ZoomOut}"/>
         <KeyBinding Key="S" Modifiers="Control+Shift" Command="SaveAs"/>
-    </Window.InputBindings>
+    </telerik:RadWindow.InputBindings>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="0*"/>
@@ -94,25 +93,24 @@
             <Separator/>
             <telerik:RadMenuItem x:Name="startButton" BorderBrush="#FF23FF00" Background="#FF0AD300" Foreground="Black" Header="▶ Start" Click="startButton_Click"/>
         </telerik:RadMenu>
-        <telerik:RadSyntaxEditor  x:Name="syntaxEditor" HorizontalAlignment="Stretch"  Grid.Row="1" Margin="0,22,0,26" VerticalAlignment="Stretch" telerik:StyleManager.Theme="Expression_Dark" Drop="syntaxEditor_DragOver" AllowDrop="True" >
-            <telerik:RadContextMenu.ContextMenu>
-                <telerik:RadContextMenu telerik:StyleManager.Theme="Expression_Dark">
-                    <telerik:RadMenuItem x:Name="undoContext" telerik:StyleManager.Theme="Expression_Dark" Header="Undo" InputGestureText="Ctrl + Z" Click="undoContext_Click"/>
-                    <telerik:RadMenuItem x:Name="redoContext" telerik:StyleManager.Theme="Expression_Dark" Header="Redo" InputGestureText="Ctrl + Y" Click="redoContext_Click"/>
-                    <telerik:Separator/>
-                    <telerik:RadMenuItem x:Name="cutContext" telerik:StyleManager.Theme="Expression_Dark" Header="Cut" InputGestureText="Ctrl + X" Click="cutContext_Click"/>
-                    <telerik:RadMenuItem x:Name="copyContext" telerik:StyleManager.Theme="Expression_Dark" Header="Copy" InputGestureText="Ctrl + C" Click="copyContext_Click"/>
-                    <telerik:RadMenuItem x:Name="pasteContext" telerik:StyleManager.Theme="Expression_Dark" Header="Paste" InputGestureText="Ctrl + V" Click="pasteContext_Click"/>
 
-                </telerik:RadContextMenu>
-            </telerik:RadContextMenu.ContextMenu>
-        </telerik:RadSyntaxEditor>
         <TextBox x:Name="compilationtext" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" AcceptsReturn="False"    HorizontalScrollBarVisibility="Hidden"  IsReadOnly="True"    Margin="42,0,20,52" Grid.RowSpan="2" VerticalScrollBarVisibility="Hidden" Height="165" Background="#FF333333" Foreground="White" Visibility="Hidden"/>
 
 
 
         <telerik:RadButton x:Name="hidebutton" Content="X" HorizontalAlignment="Right" VerticalAlignment="Bottom" Grid.RowSpan="2"  Height="51" Margin="0,0,20,166" telerik:StyleManager.Theme="Expression_Dark" Width="54" FontSize="24" Click="hidebutton_Click" Visibility="Hidden"/>
+        <telerik:RadTabControl x:Name="TabControl"  HorizontalAlignment="Stretch"  Grid.Row="1" Margin="0,22,0,26" VerticalAlignment="Stretch" telerik:StyleManager.Theme="Expression_Dark">
+            <telerik:RadTabItem x:Name="RadTabItem1" Header="Untitled">
+                <Grid Background="Transparent">
+                    <syntaxeditor:SyntaxEditor  x:Name="syntaxEditor" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Drop="syntaxEditor_DragOver" AllowDrop="True" IsLineNumberMarginVisible="True"/>
+                </Grid>
+            </telerik:RadTabItem>
+            <telerik:RadTabItem x:Name="CSS" Visibility="Hidden" Header="Untitled CSS File">
+                <syntaxeditor:SyntaxEditor  x:Name="CSSsyntaxEditor" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Drop="syntaxEditor_DragOver" AllowDrop="True" IsLineNumberMarginVisible="True" />
+            </telerik:RadTabItem>
+        </telerik:RadTabControl>
+        <telerik:RadButton x:Name="addButton" Content="+" Grid.RowSpan="2" Margin="0,22,3,0" FontSize="14" telerik:StyleManager.Theme="Expression_Dark" HorizontalAlignment="Right" Width="25" Height="26" VerticalAlignment="Top" Click="addButton_Click"/>
 
 
     </Grid>
-</Window>
+</telerik:RadWindow>
